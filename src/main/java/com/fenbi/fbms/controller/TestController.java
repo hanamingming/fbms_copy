@@ -38,7 +38,7 @@ public class TestController {
 	@RequestMapping("/getCourse")
 	@ResponseBody
 	public FenbiResult getCourse(Integer id){
-		//查询课程列表
+		//查询课程列表  
 		Course c = courseService.findById(id);
 		return new FenbiResult(c);
 	}
