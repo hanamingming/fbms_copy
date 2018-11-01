@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fenbi.fbms.mapper.CourseMapper">
+
+	<!-- 使用resultMap定义结果集映射的规则 ：告诉mybatis哪个字段对应实体类的哪个属性 -->
+	<resultMap type="com.fenbi.fbms.entity.Course" id="BaseResultMap">
+		<id column="id" property="id"/>
+		<result column="type_id" property="typeId"/>
+		<result column="description" property="description"/>
+		<result column="price" property="price"/>
+		<result column="title" property="title"/>
+		<result column="total" property="total"/>
+		<result column="sale_num" property="saleNum"/>
+		<result column="lesson_count" property="lessonCount"/>
+		<result column="start_time" property="startTime"/>
+		<result column="end_time" property="endTime"/>
+		<result column="create_time" property="createTime"/>
+		<result column="status" property="status"/>
+		<result column="fct_name" property="courseTypeName"/>
+		
+		<!-- 封装级联查询出来的lesson对象 -->
+		<collection property="lessons" ofType="com.fenbi.fbms.entity.Lesson">
+			<id column="fl_id" property="id"/>
+			<result column="fl_teacher_id" property="teacherId"/>
+			<result column="id" property="courseId"/>
+			<result column="fl_title" property="title"/>
+			<result column="fl_start_time" property="startTime"/>
+			<result column="fl_end_time" property="endTime"/>
+			<result column="fl_create_time" property="createTime"/>
+		</collection>
+		
+	</resultMap>
+
+
+	<!-- 模糊查询，有时会传递title，有时不会传递title -->
+	<select id="selectCoursesByTitleLike" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select * from fb_course 
+		<!-- _parameter代表传递过来的参数 -->
+		<if test="_parameter != null">
+			where title like '%${_parameter}%'
+		</if>
+	</select>
+
+	<!-- 级联查询lesson表，查询课程的同时吧每个课程的所有课时也都查出来 -->
+	<select id="selectAllCoursesJoinLesson" resultMap="BaseResultMap">
+		select 
+			fc.id as id,
+			fc.type_id as type_id,
+			fc.title as title,
+			fc.description as description,
+			fc.price as price,
+			fc.total as total,
+			fc.sale_num as sale_num,
+			fc.lesson_count as lesson_count,
+			fc.start_time as start_time,
+			fc.end_time as end_time,
+			fc.create_time as create_time,
+			fc.status as status,
+			
+			fl.id as fl_id,
+			fl.teacher_id as fl_teacher_id,
+			fl.title as fl_title,
+			fl.start_time as fl_start_time,
+			fl.end_time as fl_end_time,
+			fl.create_time as fl_create_time 
+			
+		from fb_course fc join fb_lesson fl on fc.id=fl.course_id
+	</select>
+
+	<!-- 查询所有课程，使用ResultMap标签做结果集数据的封装 -->
+	<select id="selectAllUseResultMap"  resultMap="BaseResultMap">
+		select 
+			fc.id as id,
+			fc.type_id as type_id,
+			fc.title as title,
+			fc.description as description,
+			fc.price as price,
+			fc.total as total,
+			fc.sale_num as sale_num,
+			fc.lesson_count as lesson_count,
+			fc.start_time as start_time,
+			fc.end_time as end_time,
+			fc.create_time as create_time,
+			fc.status as status,
+			
+			fct.name as fct_name
+			
+		from fb_course fc join fb_course_type fct on fc.type_id=fct.id
+	</select>
+
+	<!-- 通过id查询课程 -->
+	<select id="selectById" parameterType="java.lang.Integer" resultType="com.fenbi.fbms.entity.Course">
+		select 
+		
+		id as id,
+		type_id as typeId,
+		title as title,
+		description as description,
+		price as price,
+		total as total,
+		sale_num as saleNum,
+		lesson_count as lessonCount,
+		start_time as startTime,
+		end_time as endTime,
+		create_time as createTime,
+		status as status
+		
+		from fb_course where id = #{id}
+	</select>
+
+	<!-- 查询所有课程 -->
+	<select id="selectAll" resultType="com.fenbi.fbms.entity.Course">
+		select 
+		
+		id as id,
+		type_id as typeId,
+		title as title,
+		description as description,
+		price as price,
+		total as total,
+		sale_num as saleNum,
+		lesson_count as lessonCount,
+		start_time as startTime,
+		end_time as endTime,
+		create_time as createTime,
+		status as status
+		
+		from fb_course
+	</select>
+
+	<!-- 定义一个insert接口，用于完成插入数据业务 -->
+	<insert id="insert" parameterType="com.fenbi.fbms.entity.Course">
+		INSERT INTO fb_course (
+		type_id, title, description, price,
+		total, sale_num, lesson_count,
+		start_time,
+		end_time, create_time, STATUS
+		) VALUES (
+		#{typeId}, #{title},
+		#{description}, #{price},
+		#{total}, #{saleNum}, #{lessonCount},
+		#{startTime},
+		#{endTime}, #{createTime}, #{status}
+		)
+	</insert>
+
+	<!-- 编写update接口 -->
+	<update id="update" parameterType="com.fenbi.fbms.entity.Course">
+		update fb_course 
+		<set>
+			<if test="typeId != null"> type_id=#{typeId}, </if> 
+			<if test="title != null"> title=#{title},</if> 
+			<if test="description != null"> description=#{description},</if> 
+			<if test="price != null"> price=#{price},</if> 
+			<if test="total != null"> total=#{total},</if> 
+			<if test="saleNum != null"> sale_num=#{saleNum},</if> 
+			<if test="lessonCount != null"> lesson_count=#{lessonCount},</if> 
+			<if test="startTime != null"> start_time=#{startTime},</if> 
+			<if test="endTime != null"> end_time=#{endTime},</if> 
+			<if test="createTime != null"> create_time=#{createTime},</if> 
+			<if test="status != null"> status=#{status}</if>
+		</set> 
+		where id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from fb_course where id = #{id}
+	</delete>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+

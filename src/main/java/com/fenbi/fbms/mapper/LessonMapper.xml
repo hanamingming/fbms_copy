@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fenbi.fbms.mapper.LessonMapper">
+	
+	<resultMap type="com.fenbi.fbms.entity.Lesson" id="BaseResultMap">
+		<id column="id" property="id"/>
+		<result column="teacher_id" property="teacherId"/>
+		<result column="course_id" property="courseId"/>
+		<result column="title" property="title"/>
+		<result column="start_time" property="startTime"/>
+		<result column="end_time" property="endTime"/>
+		<result column="create_time" property="createTime"/>
+		
+		<!-- 级联查询讲师信息，使用association标签封装Teacher对象 -->
+		<association property="teacher" javaType="com.fenbi.fbms.entity.Teacher">
+			<id column="ft_id" property="id"/>
+			<result column="ft_name" property="name"/>
+			<result column="ft_gender" property="gender"/>
+			<result column="ft_email" property="email"/>
+			<result column="ft_username" property="username"/>
+			<result column="ft_status" property="status"/>
+			<result column="ft_photo_url" property="photoUrl"/>
+			<result column="ft_description" property="description"/>
+			<result column="ft_score" property="score"/>
+			<result column="ft_create_time" property="createTime"/>
+		</association>
+		
+	</resultMap>
+	
+	<!-- 使用LessonVo的方式封装结果集 -->
+	<resultMap type="com.fenbi.fbms.entity.LessonVo" id="LessonVoResultMap">
+		<result column="id" property="lesson.id"/>
+		<result column="teacher_id" property="lesson.teacherId"/>
+		<result column="course_id" property="lesson.courseId"/>
+		<result column="title" property="lesson.title"/>
+		<result column="start_time" property="lesson.startTime"/>
+		<result column="end_time" property="lesson.endTime"/>
+		<result column="create_time" property="lesson.createTime"/>
+		
+		<result column="ft_id" property="teacher.id"/>
+		<result column="ft_name" property="teacher.name"/>
+		<result column="ft_gender" property="teacher.gender"/>
+		<result column="ft_email" property="teacher.email"/>
+		<result column="ft_username" property="teacher.username"/>
+		<result column="ft_status" property="teacher.status"/>
+		<result column="ft_photo_url" property="teacher.photoUrl"/>
+		<result column="ft_description" property="teacher.description"/>
+		<result column="ft_score" property="teacher.score"/>
+		<result column="ft_create_time" property="teacher.createTime"/>
+	</resultMap>
+	
+	<!-- 通过课时级联查询这个课时所包含的讲师信息 -->
+	<select id="selectAllLessonsJoinTeacher" resultMap="LessonVoResultMap">
+		select 
+		
+			fl.id as id,
+			fl.teacher_id as teacher_id,
+			fl.course_id as course_id,
+			fl.title as title,
+			fl.start_time as start_time,
+			fl.end_time as end_time,
+			fl.create_time as create_time,
+			
+			ft.id as ft_id,
+			ft.name as ft_name,
+			ft.gender as ft_gender,
+			ft.email as ft_email,
+			ft.username as ft_username,
+			ft.status as ft_status,
+			ft.photo_url as ft_photo_url,
+			ft.description as ft_description,
+			ft.score as ft_score,
+			ft.create_time as ft_create_time
+		
+		from fb_lesson fl join fb_teacher ft on fl.teacher_id=ft.id
+	</select>
+	
+	<!-- 添加课时接口 -->
+	<insert id="insert" parameterType="com.fenbi.fbms.entity.Lesson">
+		insert into fb_lesson
+			(course_id, teacher_id, title, start_time, end_time, create_time)
+		values 
+			(#{courseId},#{teacherId},#{title},#{startTime},#{endTime},#{createTime})
+	</insert>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
