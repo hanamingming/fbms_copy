@@ -24,6 +24,7 @@ import com.fenbi.fbms.mapper.CourseMapper;
 import com.fenbi.fbms.service.CourseService;
 
 /**
+ * test
  * 当tomcat启动，就会读取WEB-INF目录下的springmvc-serlvet.xml配置文件，扫描com.fenbi.fbms.controller下的所有类
  * 当springmvc扫描到当前类时，将会把TestController当作一个Controller类纳入springmvc容器中进行管理。
  * 
